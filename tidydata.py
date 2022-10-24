@@ -1,37 +1,39 @@
 # Initial imports and environment setting.
 
 # matplotlib inline
-import numpy as np
-import pandas as pd
+import csv;
+import numpy as np;
+import pandas as pd;
 
-import matplotlib.pyplot as plt
-plt.rcParams.update({'font.size': 16})
+import matplotlib.pyplot as plt;
+plt.rcParams.update({'font.size': 16});
 
-import seaborn as sns
-sns.set(context='talk', style='white')
+#import seaborn as sns;
+#sns.set(context='talk', style='white');
 
-import warnings
-warnings.filterwarnings('ignore')
+import warnings;
+warnings.filterwarnings('ignore');
 
 def parse_response(s):
     try:
-        return s[~s.isnull()][0]
+        return s[~s.isnull()][0];
     except IndexError:
-        return np.nan
+        return np.nan;
 
 # Load in the data. This spreadsheet is (almost) direct from SurveyMonkey,
 # though IP addresses, access dates, and free-text responses were scrubbed
 # to anonymize respondents.
 
-df = pd.read_csv('public_survey_data.csv', sep=',')
+df = pd.read_csv('public_survey_data.csv', sep=',');
 # import pandas as pd;df = pd.read_csv('test_survey.csv',sep=',');
 # SurveyMonkey provides an odd nesting of responses when exporting results.
 # We'd like to convert this structure to a pandas MultiIndex data frame.
 # First, let's find question indices -- adapted from https://stackoverflow.com/a/49584888
 
-indices   = [ i for i, c in enumerate(df.columns) if not c.startswith('Unnamed') ]
-questions = [ c for c in df.columns if not c.startswith('Unnamed') ]
-slices    = [ slice (i, j) for i, j in zip(indices, indices[1:] + [None])]
+indices   = [ i for i, c in enumerate(df.columns) if not c.startswith('Unnamed') ];
+questions = [ c for c in df.columns if not c.startswith('Unnamed') ];
+slices    = [ slice (i, j) for i, j in zip(indices, indices[1:] + [None])];
+responses = [];
 
 # check if header rows and (first) answers are aligned
 # for q in slices:
@@ -43,9 +45,11 @@ for i in range( 1, df.shape[1] ):
     if ( i in indices ):
         # print ('{} is a question'.format(i));
         lastq = i;
+        responses.append ( [ df.iloc[ 0, i ] ] );
     else:
         # print ('attaching {} to question {}'.format(i,lastq));
         df.iloc[ :, lastq ] = df.iloc[ :, lastq ].astype(str) + ';' + df.iloc [ :, i ].astype(str);
+        responses[ -1 ].append ( df.iloc[ 0, i ] );
 
 # drop the copied columns
 for i in reversed ( range ( 1, df.shape[1] ) ):
@@ -55,7 +59,8 @@ for i in reversed ( range ( 1, df.shape[1] ) ):
 df.replace ( ';nan',';',regex=True, inplace=True ); 
 df.replace ( ';;','',regex=True, inplace=True ); 
 df.replace ( ';','',regex=False, inplace=True ); 
-df.to_csv  ( 'tidydata.csv' );
+df.replace ( '"','',regex=True, inplace=True ); 
+df.to_csv  ( 'tidydata.csv', quoting = csv.QUOTE_NONE, quotechar="",  escapechar="\\" );
 
 # There are examples on StackOverflow etc. that deal with SurveyMonkey data.
 # Problem for us with those is that none of them use multi-answer questions.
@@ -70,13 +75,45 @@ df.to_csv  ( 'tidydata.csv' );
 #
 # Next: separate reponses, store in nested structure (e.g., JSON?) 
 
-df = df.applymap( lambda x: x.split( ';' ) if isinstance( x, str ) else x )
+df = df.applymap( lambda x: x.split( ';' ) if isinstance( x, str ) else x );
 # for row in range ( df.shape [ 0 ] ):
 #     for col in range ( df.shape [ 1 ] ):
 #         value = df.iloc[row][col];        
 #         if ( type ( value ) == str ):
 #             value = value.split( ';' );
 #         df.iloc[row, col] = value; 
-
-df.to_json ( 'tidydata.json' );
+df.to_json ( 'tidydata.json', indent = 4 );
     
+# gather the options for each question
+options = df.iloc[:1].values[0].tolist(); 
+alloptions = [ ];
+for i in range ( 1, len ( options ) ):
+    
+    alloptions.append ( list ( set ( options [ i ] + [ item for sublist in df.iloc[ 1:, i ] for item in sublist ] ) ) );
+    if ( '' in alloptions [ -1 ] ):
+        alloptions [ -1 ].remove ( '' );
+    if ( 'Response' in alloptions [ -1 ] ):
+        alloptions [ -1 ].remove ( 'Response' );
+    
+# so now there's a list (of the same length as df's #columns) with questions
+# and a list of lists ( of strings ) of the same length with all possible/given responses
+
+# In [1]: runfile('.../2022-community-survey/tidydata.py', wdir='.../2022-community-survey')
+# In [2]: len(questions)
+# Out[2]: 24
+# In [3]: len(alloptions)
+# Out[3]: 24
+# In [4]: questions[1]
+# Out[4]: 'What geographic region are you currently located in?'
+# In [5]: alloptions[1]
+# Out[5]: 
+# ['North America (Including Canada and Mexico)',
+#  'Europe',
+#  'Oceania (Australia and New Zealand)',
+#  'Middle East',
+#  'South America (Including Central America)',
+#  'Asia']
+
+# and now we're back to Elizabeth's code
+matched_questions = pd.MultiIndex.from_arrays ( [tuple(questions), tuple(tuple(sub) for sub in alloptions)], names = ( 'question', 'options' ) );
+
