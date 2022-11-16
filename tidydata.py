@@ -20,6 +20,9 @@ def parse_response(s):
     except IndexError:
         return np.nan;
 
+###############################################################################
+# AMW's approach
+
 # Load in the data. This spreadsheet is (almost) direct from SurveyMonkey,
 # though IP addresses, access dates, and free-text responses were scrubbed
 # to anonymize respondents.
@@ -116,4 +119,70 @@ for i in range ( 1, len ( options ) ):
 
 # and now we're back to Elizabeth's code
 matched_questions = pd.MultiIndex.from_arrays ( [tuple(questions), tuple(tuple(sub) for sub in alloptions)], names = ( 'question', 'options' ) );
+
+
+
+
+
+
+###############################################################################
+# Simon's approach
+survey_data = pd.read_csv('public_survey_data.csv', sep=',')
+survey_clean = survey_data.copy()
+
+ID_cols = ['Unnamed: 0', 'Are you a member of OHBM?', 'What geographic region are you currently located in?', 'What is your current career status?']
+
+multi_Q1 = 'Which of the following platforms do you use to access OHBM content? When applicable, a direct link to the platform is provided next to each option. Please check all options that apply.'
+multi_Q2 = 'Do you currently follow any of the following OHBM Special Interest Groups (SIG) platforms? When applicable, a direct link to the platform is provided next to each option. Please check all options that apply.'
+multi_Q3 = 'How important is each of these types of content to you?'
+
+multi_Qs = [multi_Q1, multi_Q2, multi_Q3]
+unnamed_range = [(13, 21), (41, 47), (49, 55)]
+
+orig_name = []
+new_name = []
+
+# Rename unnamed columns to question + response option
+for q, ur in zip(multi_Qs, unnamed_range):
+    unnamed = [q] + [f'Unnamed: {i}' for i in range(ur[0], ur[1] + 1)]
+    renamed = [q + '@@' + survey_data.loc[0, un] for un in unnamed]
+    orig_name.extend(unnamed)
+    new_name.extend(renamed)
+
+
+# Rename columns
+rename_dict = {i : j for i, j in zip(orig_name, new_name)}
+survey_clean.rename(columns=rename_dict, inplace=True)
+
+# Drop response description (i.e. first row)
+survey_clean.drop(0, inplace=True)
+
+# Make long format:
+survey_long = survey_clean.melt(id_vars=ID_cols, var_name='questions', value_name='response')
+survey_long.sort_values('Unnamed: 0', inplace=True)
+
+# This removes the response options from the concatenated question string, but makes pivoting really complicated.
+survey_long['questions'] = survey_long['questions'].str.split('@@').str[0]
+group_plot = survey_long.query('questions == @multi_Q1').groupby([ID_cols[2], 'response']).size().unstack(fill_value=0)
+group_plot.transpose().plot.bar()
+plt.title(multi_Q1)
+plt.show()
+
+survey_wide = survey_long.copy()
+survey_wide['Unnamed: 0'] = survey_wide['Unnamed: 0'].astype("string")
+# Drop nans
+survey_wide.dropna(inplace=True, subset=['response'])
+survey_wide = survey_wide.groupby(ID_cols + ['questions']).agg({'response': lambda x: list(x)}).reset_index().copy()
+survey_wide['new_index'] = survey_wide[ID_cols].apply(lambda row: '@@'.join(row.values.astype(str)), axis=1)
+survey_wide.drop(columns=ID_cols, inplace=True)
+survey_wide = survey_wide.pivot('new_index', columns=['questions'], values='response')
+survey_wide.reset_index(inplace=True)
+for n, id in enumerate(ID_cols):
+    survey_wide[id] = survey_wide['new_index'].str.split('@@').str[n]
+
+survey_wide['Unnamed: 0'] = survey_wide['Unnamed: 0'].astype("int")
+
+survey_wide.drop(columns='new_index', inplace=True)
+survey_wide.sort_values('Unnamed: 0', inplace=True)
+
 
