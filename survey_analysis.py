@@ -1,4 +1,5 @@
 import warnings
+import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -129,4 +130,4 @@ mod = OrderedModel.from_formula(
     data=tw)
 res = mod.fit(method='bfgs')
 print(res.summary())
-
+print(np.exp(res.params))  # odds ratios
