@@ -1,0 +1,162 @@
+{
+    "job_board_access": [
+        "I didn't know OHBM had a job board",
+        "I know about the OHBM job board but I don't use it",
+        "I look at the OHBM job board ocassionally",
+        "I look at the OHBM job board regularly"
+    ],
+
+    "job_board_content" : [
+        "Postings are not relevant to me",
+        "Postings are somewhat relevant",
+        "Postings are relevant when related to the Annual Meeting",
+        "Postings are very relevant throughout the year"
+    ],
+
+    "email_access" : [
+        "I don't get emails from OHBM",
+        "I get emails from OHBM but I don't read them",
+        "I get emails from OHBM and I occasionally read them",
+        "I get emails from OHBM and I always read them"
+    ],
+
+    "email_content" : [
+        "I don’t know / NA",
+        "It is not relevant to me",
+        "It is somewhat relevant",
+        "It is very relevant only when related to the annual meeting",
+        "It is very relevant throughout the year"
+    ],
+
+    "blog_content" : [
+        "I don’t know / NA",
+        "It is not relevant to me",
+        "It is somewhat relevant",
+        "It is very relevant only when related to the annual meeting",
+        "It is very relevant throughout the year"
+    ],
+
+    "twitter_access" : [
+        "I don’t use Twitter / NA",
+        "I use Twitter but didn’t know that the OHBM Twitter account exists",
+        "I use Twitter and know about OHBM Twitter, but I don’t follow the account",
+        "I use Twitter, follow the OHBM Twitter account, and occasionally see their tweets",
+        "I use Twitter, follow the OHBM Twitter account, and regularly see their tweets"
+    ],
+
+    "twitter_content" : [
+        "I don’t know / NA",
+        "It is not relevant to me",
+        "It is somewhat relevant",
+        "It is very relevant only when related to the annual meeting",
+        "It is very relevant throughout the year"
+    ],
+
+    "podcast_access" : [
+        "I didn't know that OHBM had a podcast",
+        "I know about the podcast, but I don’t listen to it",
+        "I know about the podcast and occasionally listen to the episodes",
+        "I know about the podcast and regularly listen to the episodes"
+    ],
+
+    "podcast_content" : [
+        "I don’t know / NA",
+        "It is not relevant to me",
+        "It is somewhat relevant",
+        "It is very relevant only when related to specific topics",
+        "It is very relevant throughout the year"
+    ],
+
+    "facebook_content" : [
+        "I don’t know / NA",
+        "It is not relevant to me",
+        "It is somewhat relevant",
+        "It is very relevant only when related to the annual meeting",
+        "It is very relevant throughout the year"
+    ],
+
+    "youtube_access" : [
+        "I don’t use YouTube / NA",
+        "I use YouTube but didn’t know that the OHBM YouTube channel exists",
+        "I use YouTube and know about the OHBM YouTube channel, but I don’t subscribe to the channel",
+        "I use YouTube, subscribe to the channel, and occasionally watch their content",
+        "I use YouTube, subscribe to the channel, and regularly watch their content"
+ 
+    ],
+
+    "youtube_content" : [
+        "I don’t know / NA",
+        "I usually ignore it",
+        "It is not relevant to me",
+        "It is somewhat relevant",
+        "It is very relevant only when related to the annual meeting",
+        "It is very relevant throughout the year"
+    ],
+
+    "linkedin_access" : [
+        "I don’t use LinkedIn / NA",
+        "I use LinkedIn but didn’t know that the OHBM LinkedIn page exists",
+        "I use LinkedIn and know about the OHBM LinkedIn page, but I don’t follow the page",
+        "I use LinkedIn, follow the page, and occasionally see their posts",
+        "I use LinkedIn, follow the page, and regularly see their posts"
+    ],
+
+    "linkedin_content" : [
+        "I don’t know / NA",
+        "It is not relevant to me",
+        "It is somewhat relevant",
+        "It is very relevant only when related to the annual meeting",
+        "It is very relevant throughout the year"
+    ],
+
+    "ondemand_access" : [
+        "I don’t know what OnDemand is",
+        "I know about OnDemand, but I haven’t accessed any content on there",
+        "I know about OnDemand and occasionally access the content",
+        "I know about OnDemand and regularly access the content"
+    ],
+
+    "ondemand_content" : [
+        "I don’t know / NA",
+        "It is not relevant to me",
+        "It is somewhat relevant",
+        "It is very relevant only when related to the annual meeting",
+        "It is very relevant throughout the year"
+    ],
+
+    "content_platform" : [
+        "OHBM website (https://www.humanbrainmapping.org)",
+        "Official OHBM Emails (*@humanbrainmapping.org emails)",
+        "Blog (https://www.ohbmbrainmappingblog.com)",
+        "Twitter (https://twitter.com/OHBM)",
+        "NeuroSalience podcast (https://anchor.fm/ohbm)",
+        "Facebook (https://www.facebook.com/humanbrainmapping.org)",
+        "Youtube (https://www.youtube.com/channel/UCwMM4wEFi_hx2_6wVVoPBJA)",
+        "LinkedIn (https://www.linkedin.com/company/organization-for-human-brain-mapping)",
+        "OHBM OnDemand (https://www.pathlms.com/ohbm)",
+        "OHBM Job Board"
+    ],
+
+    "sig_platform" : [
+        "BrainArt Twitter (https://twitter.com/OHBM_BrainArt)",
+        "BrainArt Instagram (https://www.instagram.com/ohbm_basig)",
+        "Open Science Twitter (https://twitter.com/OhbmOpen)",
+        "Student-Postdoc Blog (https://www.ohbmtrainees.com/sig-blog)",
+        "Student-Postdoc Facebook (https://www.facebook.com/OHBMStudentandPostdocSection)",
+        "Student-Postdoc Twitter (https://twitter.com/OHBM_Trainees)",
+        "Sustainability Blog (https://ohbm-environment.org/blog)",
+        "Sustainability Twitter (https://twitter.com/OhbmEnvironment)"
+    ],
+
+    "content_importance" : [
+        "Information on the annual meeting",
+        "Information on OHBM behind-the-scenes (e.g. governance, financing)",
+        "Updates on OHBM committee / SIGs activities throughout the year",
+        "Reviews on OHBM activities",
+        "Interviews with human brain mappers",
+        "Tutorials on different topics related to human brain mapping",
+        "Controversial topics in the field",
+        "Exciting new science or developments in the brain mapping field"
+    ]
+
+}

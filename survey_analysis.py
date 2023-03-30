@@ -1,3 +1,4 @@
+import json
 import warnings
 import numpy as np
 import pandas as pd
@@ -11,6 +12,42 @@ from statsmodels.miscmodels.ordinal_model import OrderedModel
 plt.rcParams.update({'font.size': 16})
 sns.set(context='talk', style='white')
 warnings.filterwarnings('ignore')
+
+
+def fit_model(responses, query, levels):
+    """
+    Fit an ordinal logistic model to the Likert response data.
+
+    You can find more information on this model in the StatsModels documentation:
+    https://www.statsmodels.org/dev/generated/statsmodels.miscmodels.ordinal_model.OrderedModel.html
+
+    Parameters
+    ----------
+    responses : pd.DataFrame
+        Survey responses data, loaded as a Pandas DataFrame and coerced
+        into the appropriate format.
+    query : str
+        The query for which to fit a model. Possible query values are defined
+        in the `rename_questions` mapping.
+    levels : list
+        A query specific list of possible participant Likert responses, listed
+        in ordinal ranking.
+    """
+    # first, subset the full data frame
+    data = responses.query(f'question == \"{query}\"')
+    data.dropna(inplace=True)
+
+    # then, define the response levels as ordered
+    cat = CategoricalDtype(categories=levels, ordered=True)
+    data[f'{query}'] = data.response.astype(cat, copy=False)
+
+    # and fit and return the model
+    mod = OrderedModel.from_formula(
+        f'{query} ~ C(geographic_region, Treatment) + C(career_stage, Treatment)',
+        data=data)
+    res = mod.fit(method='bfgs')
+    return res
+
 
 demographics = {
     'Are you a member of OHBM?': 'is_member',
@@ -28,7 +65,7 @@ rename_questions = {
     'How would you describe the content on OHBM Twitter?': 'twitter_content',
     'How would you describe your access to the NeuroSalience podcast?': 'podcast_access',
     'How would you describe the content in the NeuroSalience podcast?': 'podcast_content',
-    'How would you describe your access to OHBM Facebook?': 'facebook_acces',
+    'How would you describe your access to OHBM Facebook?': 'facebook_access',
     'How would you describe the content in OHBM Facebook?': 'facebook_content',
     'How would you describe your access to OHBM YouTube?': 'youtube_access',
     'How would you describe the content in OHBM YouTube?': 'youtube_content',
@@ -39,38 +76,6 @@ rename_questions = {
     'Which of the following platforms do you use to access OHBM content? When applicable, a direct link to the platform is provided next to each option. Please check all options that apply.': 'content_platform',
     'Do you currently follow any of the following OHBM Special Interest Groups (SIG) platforms? When applicable, a direct link to the platform is provided next to each option. Please check all options that apply.': 'sig_platform',
     'How important is each of these types of content to you?': 'content_importance'
-}
-content_platform_opts = {
-    'OHBM website (https://www.humanbrainmapping.org)',
-    'Official OHBM Emails (*@humanbrainmapping.org emails)',
-    'Blog (https://www.ohbmbrainmappingblog.com)',
-    'Twitter (https://twitter.com/OHBM)',
-    'NeuroSalience podcast (https://anchor.fm/ohbm)',
-    'Facebook (https://www.facebook.com/humanbrainmapping.org)',
-    'Youtube (https://www.youtube.com/channel/UCwMM4wEFi_hx2_6wVVoPBJA)',
-    'LinkedIn (https://www.linkedin.com/company/organization-for-human-brain-mapping)',
-    'OHBM OnDemand (https://www.pathlms.com/ohbm)',
-    'OHBM Job Board'
-}
-sig_platform_opts = {
-    'BrainArt Twitter (https://twitter.com/OHBM_BrainArt)',
-    'BrainArt Instagram (https://www.instagram.com/ohbm_basig)',
-    'Open Science Twitter (https://twitter.com/OhbmOpen)',
-    'Student-Postdoc Blog (https://www.ohbmtrainees.com/sig-blog)',
-    'Student-Postdoc Facebook (https://www.facebook.com/OHBMStudentandPostdocSection)',
-    'Student-Postdoc Twitter (https://twitter.com/OHBM_Trainees)',
-    'Sustainability Blog (https://ohbm-environment.org/blog)',
-    'Sustainability Twitter (https://twitter.com/OhbmEnvironment)'
-}
-content_importance_options = {
-    'Information on the annual meeting',
-    'Information on OHBM behind-the-scenes (e.g. governance, financing)',
-    'Updates on OHBM committee / SIGs activities throughout the year',
-    'Reviews on OHBM activities',
-    'Interviews with human brain mappers',
-    'Tutorials on different topics related to human brain mapping',
-    'Controversial topics in the field',
-    'Exciting new science or developments in the brain mapping field'
 }
 
 # Load in the data. This spreadsheet is (almost) direct from SurveyMonkey,
@@ -111,23 +116,34 @@ responses['is_member'].value_counts(normalize=True)
 responses['geographic_region'].value_counts(normalize=True)
 responses['career_stage'].value_counts(normalize=True)
 
-# first, look at twitter access
-tw = responses.query('question == "twitter_access"')
-tw.dropna(inplace=True)
+with open('./levels.json') as f:
+    queries = json.load(f)
 
-levels = [
-    'I don’t use Twitter / NA',
-    'I use Twitter but didn’t know that the OHBM Twitter account exists',
-    'I use Twitter and know about OHBM Twitter, but I don’t follow the account',
-    'I use Twitter, follow the OHBM Twitter account, and occasionally see their tweets',
-    'I use Twitter, follow the OHBM Twitter account, and regularly see their tweets'
-    ]
-cat = CategoricalDtype(categories=levels, ordered=True)
-tw['twitter_use'] = tw.response.astype(cat, copy=False)
+for q in queries:
+    levels = queries[q]
+    print(f'Now fitting a model for {q}....')
+    res = fit_model(responses, q, levels)
+    print(res.summary())
+    print(np.exp(res.params))  # odds ratios
+    print()
 
-mod = OrderedModel.from_formula(
-    'twitter_use ~ C(geographic_region, Treatment) + C(career_stage, Treatment)',
-    data=tw)
-res = mod.fit(method='bfgs')
-print(res.summary())
-print(np.exp(res.params))  # odds ratios
+
+# FIXME : blog_access
+# ValueError: shapes (293,12) and (11,) not aligned: 12 (dim 1) != 11 (dim 0)
+    # "blog_access" : [
+    #     "I didn't know that OHBM had a blog",
+    #     "I know about the blog, but I don’t read it",
+    #     "I know about the blog and occasionally read the posts",
+    #     "I know about the blog and regularly read the post"
+    # ],
+
+
+# FIXME: facebook_access
+# ValueError: zero-size array to reduction operation maximum which has no identity
+    # "facebook_access" : [
+    #     "I don’t use Facebook / NA",
+    #     "I use Facebook but didn’t know that the OHBM Facebook page exists",
+    #     "I use Facebook and know about the OHBM Facebook page, but I don’t follow/like the page",
+    #     "I use Facebook, follow/like the page, and occasionally see their posts",
+    #     "I use Facebook, follow/like the page, and regularly see their posts"
+    # ],
