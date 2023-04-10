@@ -138,17 +138,6 @@ if __name__ == "__main__":
         print(np.exp(res.params))  # odds ratios
         print()
 
-
-# FIXME : blog_access
-# ValueError: shapes (293,12) and (11,) not aligned: 12 (dim 1) != 11 (dim 0)
-    # "blog_access" : [
-    #     "I didn't know that OHBM had a blog",
-    #     "I know about the blog, but I don’t read it",
-    #     "I know about the blog and occasionally read the posts",
-    #     "I know about the blog and regularly read the post"
-    # ],
-
-
 # FIXME: facebook_access
 # ValueError: zero-size array to reduction operation maximum which has no identity
     # "facebook_access" : [

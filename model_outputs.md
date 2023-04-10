@@ -80,7 +80,7 @@ print(res.summary())
 ```
 
 ```{code-cell} ipython3
-question = 'blog_content'
+question = 'blog_access'
 scale_values = queries[question]
 
 res = fit_model(responses, question, scale_values)

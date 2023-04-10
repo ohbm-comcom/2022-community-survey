@@ -28,6 +28,13 @@
         "It is very relevant throughout the year"
     ],
 
+    "blog_access" : [
+        "I didn't know that OHBM had a blog",
+        "I know about the blog, but I don’t read it",
+        "I know about the blog and occasionally read the posts",
+        "I know about the blog and regularly read the posts"
+    ],
+
     "blog_content" : [
         "I don’t know / NA",
         "It is not relevant to me",
