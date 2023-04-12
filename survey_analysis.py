@@ -43,7 +43,7 @@ def fit_model(responses, query, levels):
 
     # and fit and return the model
     mod = OrderedModel.from_formula(
-        f'{query} ~ C(geographic_region, Treatment) + C(career_stage, Treatment)',
+        f'{query} ~ 1 + C(geographic_region, Treatment) + C(career_stage, Treatment)',
         data=data)
     res = mod.fit(method='bfgs')
     return res
